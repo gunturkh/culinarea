@@ -6,7 +6,7 @@ import Link from "next/link";
 import Date from "../components/date";
 import { GetStaticProps } from "next";
 import cookie from "js-cookie";
-import firebase from "../firebase";
+import { firebase, auth } from "../firebase";
 import { useState, useEffect } from "react";
 
 export default function Login() {
@@ -36,6 +36,36 @@ export default function Login() {
       console.log("An error occured", e);
     }
   };
+  const handleGoogleLogin = (e) => {
+    e.preventDefault();
+    try {
+      console.log("google: ", firebase);
+      let provider = new firebase.auth.GoogleAuthProvider();
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(function (result) {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          var token = result.credential.accessToken;
+          // The signed-in user info.
+          var user = result.user;
+          console.log("Google log in: ", result);
+          // ...
+        })
+        .catch(function (error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // The email of the user's account used.
+          var email = error.email;
+          // The firebase.auth.AuthCredential type that was used.
+          var credential = error.credential;
+          // ...
+        });
+    } catch (e) {
+      console.log("An error occured", e);
+    }
+  };
   const handleLogOut = () => {
     firebase
       .auth()
@@ -56,7 +86,7 @@ export default function Login() {
         console.log("user successfully logout: ", user);
       }
     });
-  }, isLogin);
+  }, [isLogin]);
   return (
     <Layout home>
       <Head>
@@ -87,6 +117,7 @@ export default function Login() {
             <button type="submit" onClick={handleSubmit}>
               Submit
             </button>
+            <button onClick={handleGoogleLogin}>Google</button>
           </>
         )}
         {isLogin && (
